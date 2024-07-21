@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+	<types>
+		<members>AL_Record_Channel_Swarm_Component</members>
+		<members>Record_Channel_Hack_for_Account_Slack_Channel_ID</members>
+		<members>Record_Channel_Hack_for_Oppty_Slack_Channel_ID</members>
+		<name>Flow</name>
+	</types>
+	<types>
+  <members>Opportunity.demo_Slack_Record_Channel_ID__c</members>
+  <members>Account.demo_Slack_Record_Channel_ID__c</members>
+  <name>CustomField</name>
+</types>
+	<types>
+		<members>Account.Link_Record_Channel</members>
+		<members>Opportunity.Link_Record_Channel</members>
+		<name>QuickAction</name>
+	</types>
+	<version>60.0</version>
+</Package>

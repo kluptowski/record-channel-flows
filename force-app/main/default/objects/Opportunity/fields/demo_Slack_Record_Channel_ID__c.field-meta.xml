@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>demo_Slack_Record_Channel_ID__c</fullName>
+    <description>Built to support a flow that mimics the idea of the slack conversations component for record channels</description>
+    <externalId>false</externalId>
+    <inlineHelpText>for slack flow</inlineHelpText>
+    <label>Slack Record Channel ID</label>
+    <length>20</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
