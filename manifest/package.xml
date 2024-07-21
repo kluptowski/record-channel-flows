@@ -17,4 +17,8 @@
 		<name>QuickAction</name>
 	</types>
 	<version>60.0</version>
+		<types>
+		<members>Admin</members>
+		<name>Profile</name>
+	</types>
 </Package>
