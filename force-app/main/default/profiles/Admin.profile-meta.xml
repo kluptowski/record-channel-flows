@@ -11,8 +11,4 @@
         <field>Opportunity.demo_Slack_Record_Channel_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <userPermissions>
-        <enabled>false</enabled>
-        <name>SendExternalEmailAvailable</name>
-    </userPermissions>
 </Profile>
