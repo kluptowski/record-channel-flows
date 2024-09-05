@@ -1,8 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>61.0</apiVersion>
-    <description>Dupe experience for the component but with a record channel</description>
+    <assignments>
+        <name>CR_Id_assign</name>
+        <label>CR Id assign</label>
+        <locationX>242</locationX>
+        <locationY>674</locationY>
+        <assignmentItems>
+            <assignToReference>vCollabIDForSwarmCreate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Check_for_Dupe_CR.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_Swarm</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>if you have to create a new collab room use that id</description>
+        <name>CR_Id_assign_for_new</name>
+        <label>CR Id assign for new</label>
+        <locationX>506</locationX>
+        <locationY>782</locationY>
+        <assignmentItems>
+            <assignToReference>vCollabIDForSwarmCreate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Create_Collab_Room</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>vSwarmNameToUse</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fSwarmName</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_Swarm</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>checks if this is a true duplicate or if</description>
+        <name>Full_Dupe</name>
+        <label>Full Dupe?</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <defaultConnector>
+            <targetReference>Find_CR</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Continue</defaultConnectorLabel>
+        <rules>
+            <name>Full_Dupe_Stop</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Check_for_Swarm_Dupe.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Full Dupe - Stop</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>is_there_a_dupe</name>
+        <label>is there a dupe?</label>
+        <locationX>374</locationX>
+        <locationY>566</locationY>
+        <defaultConnector>
+            <targetReference>Create_Collab_Room</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Dupe</defaultConnectorLabel>
+        <rules>
+            <name>Dupe_Channel_ID_Exists</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Check_for_Dupe_CR.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>CR_Id_assign</targetReference>
+            </connector>
+            <label>Dupe Channel ID Exists</label>
+        </rules>
+    </decisions>
+    <description>Dupe experience for the component but with a record channel + now with dupe checks +v3 not active with swarm name from cr</description>
     <environments>Default</environments>
+    <formulas>
+        <name>fSwarmName</name>
+        <dataType>String</dataType>
+        <expression>&quot;#&quot;&amp;LEFT({!inputRecordName},70)&amp;&quot; Channel&quot;</expression>
+    </formulas>
     <formulas>
         <name>fSwarmURL</name>
         <dataType>String</dataType>
@@ -33,15 +126,15 @@
         <description>Slack Channel</description>
         <name>Create_Collab_Room</name>
         <label>Create Collab Room</label>
-        <locationX>176</locationX>
-        <locationY>242</locationY>
+        <locationX>506</locationX>
+        <locationY>674</locationY>
         <connector>
-            <targetReference>Create_Swarm</targetReference>
+            <targetReference>CR_Id_assign_for_new</targetReference>
         </connector>
         <inputAssignments>
             <field>Name</field>
             <value>
-                <stringValue>RMC for {!inputRecordID}</stringValue>
+                <elementReference>fSwarmName</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -63,12 +156,12 @@
         <description>this is what makes it appear on the page</description>
         <name>Create_Swarm</name>
         <label>Create Swarm</label>
-        <locationX>176</locationX>
-        <locationY>350</locationY>
+        <locationX>374</locationX>
+        <locationY>974</locationY>
         <inputAssignments>
             <field>CollaborationRoomId</field>
             <value>
-                <elementReference>Create_Collab_Room</elementReference>
+                <elementReference>vCollabIDForSwarmCreate</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -86,7 +179,7 @@
         <inputAssignments>
             <field>Name</field>
             <value>
-                <stringValue>Swarm for {!inputRecordID}</stringValue>
+                <elementReference>fSwarmName</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -117,13 +210,64 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
     <recordLookups>
-        <name>Find_CR</name>
-        <label>Find CR</label>
+        <name>Check_for_Dupe_CR</name>
+        <label>Check for Dupe CR</label>
+        <locationX>374</locationX>
+        <locationY>458</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>is_there_a_dupe</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>PlatformKey</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>inputChannelSlackID</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>CollaborationRoom</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>checks if this record already has a swarm</description>
+        <name>Check_for_Swarm_Dupe</name>
+        <label>Check for Swarm Dupe</label>
         <locationX>176</locationX>
         <locationY>134</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Create_Collab_Room</targetReference>
+            <targetReference>Full_Dupe</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RelatedRecordId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>inputRecordID</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>CollaborationUrl</field>
+            <operator>Contains</operator>
+            <value>
+                <elementReference>inputChannelSlackID</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Swarm</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>find _any_ collaboration room to pull down the workspace id so that we don&apos;t have to ask the end users for it</description>
+        <name>Find_CR</name>
+        <label>Find CR for workspace id</label>
+        <locationX>374</locationX>
+        <locationY>350</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_for_Dupe_CR</targetReference>
         </connector>
         <object>CollaborationRoom</object>
         <outputAssignments>
@@ -137,10 +281,10 @@
         <locationX>50</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Find_CR</targetReference>
+            <targetReference>Check_for_Swarm_Dupe</targetReference>
         </connector>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
     <variables>
         <name>inputChannelSlackID</name>
         <dataType>String</dataType>
@@ -153,6 +297,28 @@
         <dataType>String</dataType>
         <isCollection>false</isCollection>
         <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>For prettier name</description>
+        <name>inputRecordName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>vCollabIDForSwarmCreate</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>vSwarmNameToUse</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>
     <variables>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>61.0</apiVersion>
-    <description>Account object hack.</description>
+    <description>Account object hack + name variable</description>
     <environments>Default</environments>
     <interviewLabel>Record Channel Hack for Account Slack Channel ID {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Record Channel Hack for Account Slack Channel ID</label>
@@ -30,13 +30,19 @@
         <connector>
             <targetReference>Create_RC_Swarm</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterLogic>and</filterLogic>
         <filters>
             <field>demo_Slack_Record_Channel_ID__c</field>
             <operator>IsNull</operator>
             <value>
                 <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>demo_Slack_Record_Channel_ID__c</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
             </value>
         </filters>
         <object>Account</object>
@@ -61,6 +67,12 @@
             <name>inputRecordID</name>
             <value>
                 <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>inputRecordName</name>
+            <value>
+                <elementReference>$Record.Name</elementReference>
             </value>
         </inputAssignments>
     </subflows>
