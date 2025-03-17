@@ -284,7 +284,7 @@
             <targetReference>Check_for_Swarm_Dupe</targetReference>
         </connector>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
     <variables>
         <name>inputChannelSlackID</name>
         <dataType>String</dataType>
