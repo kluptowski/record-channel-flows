@@ -3,6 +3,7 @@
 	<types>
 		<members>AL_Record_Channel_Swarm_Component</members>
 		<members>AL_Lightning_Channel_from_Slack</members>
+		<members>AL_Slack_to_Case</members>
 		<members>Record_Channel_Hack_for_Account_Slack_Channel_ID</members>
 		<members>Record_Channel_Hack_for_Oppty_Slack_Channel_ID</members>
 		<name>Flow</name>
